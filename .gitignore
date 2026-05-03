@@ -1,0 +1,13 @@
+venv/
+__pycache__/
+*.pyc
+.DS_Store
+
+output/*.json
+output/*.csv
+output/*.txt
+
+kaggle_RC_2019-05.csv
+
+.ipynb_checkpoints/
+.env
