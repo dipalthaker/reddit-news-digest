@@ -1,168 +1,141 @@
 # Reddit News Digest
 
-Reddit News Digest is an interactive Streamlit application that analyzes Reddit-style discussion datasets and turns topic-specific records into readable, multi-perspective digests.
+<p align="center">
+  <strong>A Human-Centered Data Science dashboard for turning Reddit discussions into topic-focused, multi-perspective digests.</strong>
+</p>
 
-The project helps users explore what Reddit discussions are saying about a selected topic by filtering relevant records, clustering similar content into perspectives, scoring credibility signals, and presenting the results through a clean dashboard with summaries and visualizations.
-
----
-
-## What the Project Does
-
-The application allows users to:
-
-- select a Reddit-style CSV dataset
-- enter a topic or keyword group
-- filter records that strongly match the selected topic
-- group similar records into discussion perspectives
-- generate readable summaries for each perspective
-- calculate transparent credibility signals
-- view representative records from each cluster
-- explore charts for credibility, sources, subreddits, and clusters
-- download the analyzed results as a CSV file
-
-The dashboard is designed to reduce information overload by turning raw Reddit records into a structured digest.
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.9+-3776AB?style=for-the-badge&logo=python&logoColor=white" />
+  <img src="https://img.shields.io/badge/Streamlit-Dashboard-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" />
+  <img src="https://img.shields.io/badge/scikit--learn-KMeans-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white" />
+  <img src="https://img.shields.io/badge/NLP-TF--IDF-2563EB?style=for-the-badge" />
+</p>
 
 ---
 
-## Key Features
+## Overview
 
-- Streamlit-based interactive dashboard
-- Automatic CSV column detection
-- Support for multiple Reddit-style datasets
-- Topic keyword extraction
-- Keyword expansion using an alias map
-- Exact word matching to reduce false matches
-- Weighted relevance scoring
-- Minimum relevance threshold to reject weak results
-- TF-IDF vectorization for text analysis
-- KMeans clustering for grouping similar records
-- Cluster keyword extraction
-- Heuristic credibility scoring
-- Extractive summary generation
-- Representative records for each perspective
-- Donut chart visualizations
-- Data preview and downloadable output
+**Reddit News Digest** is an interactive dashboard that analyzes Reddit-style datasets and converts raw discussion records into readable, topic-scoped digests.
+
+The application lets users choose a dataset, enter a topic, filter relevant records, cluster similar content into perspectives, score credibility signals, and explore results through a clean Streamlit interface.
+
+The goal is to reduce information overload and make social media discourse easier to interpret.
 
 ---
 
-## Technologies Used
+## What It Does
 
-### Programming Language
+| Capability | Description |
+|---|---|
+| Topic Filtering | Finds Reddit records that strongly match the user's topic keywords |
+| Relevance Scoring | Ranks records using title, body, subreddit, and domain matches |
+| Text Vectorization | Converts text into TF-IDF vectors for analysis |
+| Clustering | Uses KMeans to group similar records into perspectives |
+| Credibility Signals | Scores records using engagement, source, text quality, and risk indicators |
+| Digest Generation | Creates readable summaries for each discussion perspective |
+| Visual Analytics | Shows cluster, credibility, subreddit, and source-domain breakdowns |
+| Data Export | Allows users to download analyzed results as CSV |
 
-- Python
+---
 
-### Web App / Dashboard
+## Dashboard Preview
 
-- Streamlit
+The app contains three main sections:
 
-### Data Processing
-
-- pandas
-- numpy
-- regular expressions
-- CSV parsing
-
-### Text Analysis
-
-- TF-IDF vectorization
-- English stopword removal
-- unigram and bigram feature extraction
-- keyword expansion
-- exact word matching
-- weighted relevance scoring
-
-### Machine Learning
-
-- KMeans clustering from scikit-learn
-
-### Visualization
-
-- matplotlib
-- Streamlit metrics
-- Streamlit data tables
-
-### Output Formats
-
-- JSON digest output
-- CSV analyzed dataset output
-- TXT digest output
+| Page | Purpose |
+|---|---|
+| **About** | Explains the project and gives recommended search examples |
+| **Run Analysis** | Lets the user choose a dataset, enter keywords, and run the pipeline |
+| **Explore Results** | Shows the digest, perspective cards, visualizations, and data preview |
 
 ---
 
 ## System Pipeline
 
-```text
-Raw Reddit CSV
-→ adaptive column detection
-→ text cleaning
-→ keyword extraction
-→ keyword expansion
-→ weighted relevance filtering
-→ TF-IDF vectorization
-→ KMeans clustering
-→ credibility scoring
-→ cluster summarization
-→ Streamlit dashboard
+```mermaid
+flowchart LR
+    A[Raw Reddit CSV] --> B[Adaptive Column Detection]
+    B --> C[Text Cleaning]
+    C --> D[Keyword Extraction]
+    D --> E[Keyword Expansion]
+    E --> F[Weighted Relevance Filtering]
+    F --> G[TF-IDF Vectorization]
+    G --> H[KMeans Clustering]
+    H --> I[Credibility Scoring]
+    I --> J[Cluster Summaries]
+    J --> K[Streamlit Dashboard]
 ```
 
 ---
 
-## How the App Works
+## Technical Stack
 
-### 1. Dataset Selection
+| Area | Tools / Methods |
+|---|---|
+| Language | Python |
+| Dashboard | Streamlit |
+| Data Processing | pandas, numpy |
+| Text Processing | regex, keyword extraction, alias expansion |
+| NLP Features | TF-IDF, unigrams, bigrams, stopword removal |
+| Machine Learning | KMeans clustering, scikit-learn |
+| Visualization | matplotlib, Streamlit metrics, Streamlit dataframes |
+| Output | JSON, CSV, TXT |
 
-The app scans the project folder for CSV files and lets the user choose a dataset from the sidebar.
+---
 
-It supports Reddit-style datasets with columns such as:
+## Core Methods
+
+### 1. Adaptive Column Detection
+
+The app supports different Reddit-style CSV formats by detecting common column names automatically.
+
+Supported examples include:
 
 ```text
-title
-body
-selftext
-text
-subreddit
-score
-num_comments
-url
-created_utc
+title, headline, post_title
+body, selftext, text, content, description
+subreddit, community
+score, upvotes, ups
+num_comments, comments, comment_count
+url, link, permalink
+created_utc, created, date, timestamp
 ```
 
-The app automatically detects available columns and maps them to the internal fields used by the pipeline.
+This allows the same app to work with both post-level and comment-level datasets.
 
 ---
 
 ### 2. Text Preparation
 
-The app creates an `analysis_text` field from the best available text columns.
+The app builds a unified text field called `analysis_text`.
 
-For post-level datasets:
+For post-level data:
 
 ```text
 analysis_text = title + body
 ```
 
-For comment-level datasets, it uses the best available text field, such as `body` or `text`.
+For comment-level data, the app uses the best available text column, such as `body` or `text`.
 
-The cleaning stage removes or filters:
+The cleaning stage filters:
 
-- HTML fragments
-- extra whitespace
 - deleted or removed content
-- AutoModerator content
-- megathreads or daily discussion threads
+- AutoModerator-style records
+- megathreads and daily discussion threads
 - very short records
+- extra whitespace and HTML fragments
 
 ---
 
-### 3. Keyword and Relevance Filtering
+### 3. Keyword Expansion and Relevance Filtering
 
-The user enters a topic or keyword group, for example:
+Users enter a topic or keyword group, such as:
 
 ```text
-climate, weather, storm, flooding, heat
+AI, artificial intelligence, automation, jobs, technology
 ```
 
-The app extracts keywords and expands known terms.
+The app expands known terms using an alias map.
 
 Example:
 
@@ -170,30 +143,24 @@ Example:
 AI → AI, artificial intelligence, machine learning, automation, ChatGPT, OpenAI
 ```
 
-The app uses exact word matching so short keywords do not accidentally match unrelated words.
-
 Each record receives a weighted relevance score:
 
-```text
-title match      +4.0
-body match       +2.0
-subreddit match  +1.0
-domain match     +0.5
-```
+| Match Location | Weight |
+|---|---:|
+| Title | +4.0 |
+| Body | +2.0 |
+| Subreddit | +1.0 |
+| Domain | +0.5 |
 
-This helps prioritize records where the topic appears in important fields like the title.
+The title receives the highest weight because post titles usually contain the clearest topic signal.
 
-If too few records match, the app stops and asks the user to try broader or clearer keywords. This prevents the dashboard from generating misleading digests from weak matches.
+The app also uses exact word matching to reduce false matches. For example, `AI` will not match unrelated words like `said` or `claim`.
 
 ---
 
-### 4. TF-IDF Text Vectorization
+### 4. TF-IDF Vectorization
 
 After filtering, the app converts text into numerical vectors using TF-IDF.
-
-TF-IDF gives higher weight to words or phrases that are important within a record but not common across all records.
-
-The vectorizer uses:
 
 ```python
 TfidfVectorizer(
@@ -205,20 +172,18 @@ TfidfVectorizer(
 )
 ```
 
-This means the app uses:
+This configuration uses:
 
 - English stopword removal
-- up to 4000 text features
-- unigrams and bigrams
+- up to 4000 features
+- single words and two-word phrases
 - filtering of extremely common terms
 
 ---
 
 ### 5. KMeans Clustering
 
-The app uses KMeans clustering to group similar Reddit records into perspectives.
-
-The user selects the number of perspectives from the sidebar.
+The app groups similar records into perspectives using KMeans.
 
 ```python
 KMeans(
@@ -228,31 +193,27 @@ KMeans(
 )
 ```
 
-Each cluster becomes one perspective in the final digest.
+The user selects the number of perspectives from the sidebar.
+
+Each cluster becomes a perspective card in the final digest.
 
 ---
 
-### 6. Cluster Keywords
+### 6. Credibility Scoring
 
-For each cluster, the app extracts the strongest TF-IDF terms. These terms are shown as keyword chips in the dashboard and help explain what each perspective is mainly about.
-
----
-
-### 7. Credibility Scoring
-
-The project uses a transparent heuristic credibility score.
-
-The score is not a factual truth label. It is a signal based on available metadata and text characteristics.
+The credibility score is a transparent heuristic signal. It is **not** a factual truth label.
 
 The score uses:
 
-- Reddit score or upvotes
-- number of comments
-- title and body length
-- source or domain reliability
-- toxicity and misinformation keyword indicators
+| Signal | Purpose |
+|---|---|
+| Reddit Score / Upvotes | Measures engagement |
+| Number of Comments | Measures discussion activity |
+| Title and Body Length | Estimates text quality |
+| Source Domain | Adds source reliability signal |
+| Risk Keywords | Penalizes toxic or misinformation-style language |
 
-Engagement values are log-normalized using:
+Engagement values are log-normalized:
 
 ```python
 log1p(score)
@@ -261,69 +222,39 @@ log1p(num_comments)
 
 Credibility levels:
 
-```text
-75+     High
-55–74   Moderate
-35–54   Low
-<35     Very Low
-```
-
-The credibility score should be interpreted as a helpful signal, not as verified fact-checking.
+| Score Range | Label |
+|---:|---|
+| 75+ | High |
+| 55–74 | Moderate |
+| 35–54 | Low |
+| Below 35 | Very Low |
 
 ---
 
-### 8. Summary Generation
+### 7. Cluster Summarization
 
-For each cluster, the app generates an extractive, template-based summary using:
+Each cluster summary is generated using an extractive, template-based approach.
 
-- top cluster keywords
+The app uses:
+
+- top TF-IDF cluster keywords
 - strongest representative records
 - most common subreddits
 - most common linked domains
 
-This approach keeps summaries readable and transparent.
-
----
-
-## Dashboard Pages
-
-### About
-
-Explains the purpose of the project and gives examples of effective searches.
-
-### Run Analysis
-
-Allows users to configure:
-
-- dataset
-- topic keywords
-- number of perspectives
-- maximum matched records
-- minimum relevant records required
-
-### Explore Results
-
-Shows:
-
-- executive summary
-- perspective cards
-- credibility metrics
-- representative records
-- visualizations
-- data preview
-- CSV download option
+This keeps the summary explainable and avoids overclaiming from noisy Reddit data.
 
 ---
 
 ## Visualizations
 
-The app includes charts for:
+The dashboard includes charts for:
 
 - records by perspective
 - credibility breakdown
 - top subreddits
 - top linked domains
-- high credibility records by cluster
+- high-credibility records by cluster
 - maximum-score records by cluster
 
 It also includes a perspective snapshot table with:
@@ -358,13 +289,13 @@ The app can also run on the larger Reddit comments dataset:
 kaggle_RC_2019-05.csv
 ```
 
-However, this file is not included in the GitHub repository because it is approximately 177 MB and exceeds GitHub's standard 100 MB file size limit.
+This file is **not included** in the repository because it is approximately **177 MB**, which exceeds GitHub's standard 100 MB file size limit.
 
 To use the large dataset:
 
 1. Download the Kaggle Reddit Comments May 2019 dataset.
-2. Place the CSV file in the project root folder.
-3. Make sure it is named:
+2. Place it in the project root folder.
+3. Ensure the file is named:
 
 ```text
 kaggle_RC_2019-05.csv
@@ -386,7 +317,7 @@ The app will automatically detect the CSV and show it in the dataset dropdown.
 
 ---
 
-## How to Run the Project
+## Installation and Usage
 
 ### 1. Clone the Repository
 
@@ -403,13 +334,13 @@ python3 -m venv venv
 
 ### 3. Activate the Virtual Environment
 
-On macOS or Linux:
+macOS / Linux:
 
 ```bash
 source venv/bin/activate
 ```
 
-On Windows:
+Windows:
 
 ```bash
 venv\Scripts\activate
@@ -433,9 +364,7 @@ The app will open in your browser.
 
 ## Recommended Search Examples
 
-Use multiple specific keywords instead of a single broad word.
-
-Good examples:
+Use multiple specific keywords instead of one broad word.
 
 ```text
 AI, artificial intelligence, automation, jobs, technology
@@ -445,7 +374,7 @@ graduate school, degree, university, students, tuition, education
 jobs, layoffs, salary, workers, unemployment, paycheck
 ```
 
-Avoid vague one-word searches such as:
+Avoid vague one-word searches like:
 
 ```text
 AI
@@ -455,7 +384,7 @@ masters
 news
 ```
 
-Specific keyword groups produce more relevant and readable digests.
+Specific keyword groups produce cleaner and more relevant digests.
 
 ---
 
@@ -478,7 +407,7 @@ Optional local-only dataset:
 kaggle_RC_2019-05.csv
 ```
 
-This large file is not included in the repository.
+This file is not included in GitHub because it exceeds GitHub's file size limit.
 
 ---
 
@@ -496,14 +425,14 @@ This large file is not included in the repository.
 
 ## Future Improvements
 
-Possible future upgrades include:
+Potential upgrades include:
 
 - claim extraction and factual verification
 - Google Fact Check Tools API integration
 - ClaimBuster integration
 - stronger source reliability database
 - semantic embeddings with SentenceTransformers
-- UMAP or PCA-based cluster visualization
+- UMAP or PCA cluster visualization
 - real-time Reddit API support
 - user personalization based on topic preferences
 - adjustable credibility thresholds
@@ -513,7 +442,7 @@ Possible future upgrades include:
 
 ## Team
 
-Group 3  
+**Group 3**  
 Human-Centered Data Science  
 Spring 2026
 
