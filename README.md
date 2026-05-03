@@ -444,11 +444,12 @@ Potential upgrades include:
 
 **Group 3**  
 Human-Centered Data Science  
+Group 3
 Spring 2026
 
 - Dipal Thaker
-- Malhar Gudekar
 - Yashvi Bhatt
+- Malhar Gudekar
 
 ---
 
